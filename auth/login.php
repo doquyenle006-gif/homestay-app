@@ -101,8 +101,8 @@ include '../includes/header.php';
                     <div class="text-center mt-3">
                         <small class="text-muted">
                             <strong>Tài khoản demo:</strong><br>
-                            Admin: admin / admin123<br>
-                            User: john_doe / password123
+                            Admin: admin / admin<br>
+                            User: user1 / user1
                         </small>
                     </div>
                 </div>

@@ -97,13 +97,13 @@ include 'includes/header.php';
         ?>
     </div>
 
-    <div class="row mt-5">
+    <!-- <div class="row mt-5">
         <div class="col-12 text-center">
             <a href="/homestay_v2/user/rooms.php" class="btn btn-outline-primary btn-lg">
                 <i class="fas fa-list"></i> Xem tất cả phòng
             </a>
         </div>
-    </div>
+    </div> -->
 </section>
 
 <!-- Features Section -->

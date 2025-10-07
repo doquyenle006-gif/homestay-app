@@ -49,6 +49,20 @@
             padding: 40px 0;
             margin-top: 50px;
         }
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            background-color: #007bff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+        .dropdown-menu {
+            min-width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -65,11 +79,8 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="/homestay_v2/index.php">Trang chủ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/homestay_v2/user/rooms.php">Phòng</a>
                     </li>
                     <?php if (isLoggedIn()): ?>
                         <li class="nav-item">
@@ -78,7 +89,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/homestay_v2/user/profile.php">Hồ sơ</a>
                         </li>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
                     <?php if (isAdmin()): ?>
                         <li class="nav-item">
                             <a class="nav-link text-success" href="/homestay_v2/admin/dashboard.php">
@@ -90,15 +101,38 @@
                 
                 <ul class="navbar-nav">
                     <?php if (isLoggedIn()): ?>
-                        <li class="nav-item">
-                            <span class="navbar-text me-3">
-                                Xin chào, <?php echo $_SESSION['full_name']; ?>!
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/homestay_v2/auth/logout.php">
-                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="avatar-circle me-2">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <span class="d-none d-md-inline"><?php echo $_SESSION['full_name']; ?></span>
                             </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <span class="dropdown-item-text">
+                                        <small>Xin chào, <?php echo $_SESSION['full_name']; ?>!</small>
+                                    </span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="/homestay_v2/user/profile.php">
+                                        <i class="fas fa-user-edit me-2"></i> Hồ sơ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/homestay_v2/user/booking.php">
+                                        <i class="fas fa-calendar-plus me-2"></i> Đặt phòng
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/homestay_v2/auth/logout.php">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
