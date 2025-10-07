@@ -92,9 +92,52 @@ if ($room_id > 0 && $action == 'edit') {
     $room = $result->fetch_assoc();
 }
 
-// Get all rooms
-$rooms_sql = "SELECT * FROM rooms ORDER BY created_at DESC";
-$rooms_result = executeQuery($rooms_sql);
+// Get search parameters
+$search_name = isset($_GET['search_name']) ? sanitizeInput($_GET['search_name']) : '';
+$search_status = isset($_GET['search_status']) ? sanitizeInput($_GET['search_status']) : '';
+$search_min_price = isset($_GET['search_min_price']) ? floatval($_GET['search_min_price']) : 0;
+$search_max_price = isset($_GET['search_max_price']) ? floatval($_GET['search_max_price']) : 0;
+
+// Build SQL query with search filters
+$rooms_sql = "SELECT * FROM rooms WHERE 1=1";
+$params = [];
+$types = "";
+
+if (!empty($search_name)) {
+    $rooms_sql .= " AND name LIKE ?";
+    $params[] = "%$search_name%";
+    $types .= "s";
+}
+
+if (!empty($search_status)) {
+    $rooms_sql .= " AND status = ?";
+    $params[] = $search_status;
+    $types .= "s";
+}
+
+if ($search_min_price > 0) {
+    $rooms_sql .= " AND price_per_night >= ?";
+    $params[] = $search_min_price;
+    $types .= "d";
+}
+
+if ($search_max_price > 0) {
+    $rooms_sql .= " AND price_per_night <= ?";
+    $params[] = $search_max_price;
+    $types .= "d";
+}
+
+$rooms_sql .= " ORDER BY created_at DESC";
+
+// Execute query with parameters
+if (!empty($params)) {
+    $stmt = $conn->prepare($rooms_sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $rooms_result = $stmt->get_result();
+} else {
+    $rooms_result = $conn->query($rooms_sql);
+}
 
 include '../includes/admin_header.php';
 
@@ -119,6 +162,66 @@ if ($action == 'add' || ($action == 'edit' && $room_id > 0)) {
                 <a href="rooms.php?action=add" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Thêm Phòng Mới
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-filter"></i> Bộ lọc</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search_name" class="form-label">Tên phòng</label>
+                                <input type="text" class="form-control" id="search_name" name="search_name"
+                                       value="<?php echo htmlspecialchars($search_name); ?>"
+                                       placeholder="Nhập tên phòng...">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="search_status" class="form-label">Trạng thái</label>
+                                <select class="form-select" id="search_status" name="search_status">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="available" <?php echo $search_status == 'available' ? 'selected' : ''; ?>>Có sẵn</option>
+                                    <option value="unavailable" <?php echo $search_status == 'unavailable' ? 'selected' : ''; ?>>Không khả dụng</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="search_min_price" class="form-label">Giá tối thiểu</label>
+                                <input type="number" class="form-control" id="search_min_price" name="search_min_price"
+                                       value="<?php echo $search_min_price > 0 ? $search_min_price : ''; ?>"
+                                       placeholder="0" min="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="search_max_price" class="form-label">Giá tối đa</label>
+                                <input type="number" class="form-control" id="search_max_price" name="search_max_price"
+                                       value="<?php echo $search_max_price > 0 ? $search_max_price : ''; ?>"
+                                       placeholder="0" min="0">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Lọc
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if (!empty($search_name) || !empty($search_status) || $search_min_price > 0 || $search_max_price > 0): ?>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <a href="rooms.php" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-refresh"></i> Xóa bộ lọc
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

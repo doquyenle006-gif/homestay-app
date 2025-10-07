@@ -5,7 +5,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5><i class="fas fa-home"></i> Homestay Manager</h5>
+                    <h5><i class="fas fa-home"></i> Homestay</h5>
                     <p>Hệ thống quản lý homestay chuyên nghiệp, giúp bạn dễ dàng quản lý và đặt phòng.</p>
                 </div>
                 <div class="col-md-4">

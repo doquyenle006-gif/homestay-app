@@ -84,7 +84,6 @@ if (!$is_included) {
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/homestay_v2/admin/dashboard.php">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="/homestay_v2/admin/rooms.php">Quản lý phòng</a></li>
                     <li class="breadcrumb-item active">
                         <?php echo $room_id > 0 ? 'Chỉnh sửa phòng' : 'Thêm phòng mới'; ?>

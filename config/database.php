@@ -46,5 +46,5 @@ if (!function_exists('getLastInsertId')) {
     }
 }
 
-echo "Database connected successfully!";
+// Database connected successfully
 ?>

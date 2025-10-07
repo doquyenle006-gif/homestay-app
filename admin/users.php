@@ -252,62 +252,6 @@ include '../includes/admin_header.php';
         </div>
     </div>
 
-    <!-- Statistics -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Thống kê người dùng</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <?php
-                        $total_users = executeQuery("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
-                        $admin_users = executeQuery("SELECT COUNT(*) as count FROM users WHERE role = 'admin'")->fetch_assoc()['count'];
-                        $regular_users = executeQuery("SELECT COUNT(*) as count FROM users WHERE role = 'user'")->fetch_assoc()['count'];
-                        $active_users = executeQuery("SELECT COUNT(DISTINCT user_id) as count FROM bookings")->fetch_assoc()['count'];
-                        ?>
-                        
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body text-center">
-                                    <h4><?php echo $total_users; ?></h4>
-                                    <p class="mb-0">Tổng người dùng</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-danger text-white">
-                                <div class="card-body text-center">
-                                    <h4><?php echo $admin_users; ?></h4>
-                                    <p class="mb-0">Quản trị viên</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-success text-white">
-                                <div class="card-body text-center">
-                                    <h4><?php echo $regular_users; ?></h4>
-                                    <p class="mb-0">Người dùng thường</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-info text-white">
-                                <div class="card-body text-center">
-                                    <h4><?php echo $active_users; ?></h4>
-                                    <p class="mb-0">Đã đặt phòng</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <?php include '../includes/footer.php'; ?>

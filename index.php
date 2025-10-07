@@ -8,7 +8,7 @@ include 'includes/header.php';
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container text-center">
-        <h1 class="display-4 mb-4">Chào mừng đến với Homestay Manager</h1>
+        <h1 class="display-4 mb-4">Chào mừng đến với Homestay</h1>
         <p class="lead mb-4">Hệ thống quản lý homestay chuyên nghiệp - Dễ dàng tìm kiếm và đặt phòng</p>
         <div class="row justify-content-center">
             <div class="col-md-8">

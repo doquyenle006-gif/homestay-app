@@ -278,58 +278,6 @@ include '../includes/admin_header.php';
         </div>
     </div>
 
-    <!-- Statistics -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Thống kê đặt phòng</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <?php
-                        $stats_sql = "SELECT status, COUNT(*) as count, SUM(total_price) as revenue 
-                                     FROM bookings 
-                                     GROUP BY status";
-                        $stats_result = executeQuery($stats_sql);
-                        
-                        while ($stat = $stats_result->fetch_assoc()):
-                            $bg_class = '';
-                            switch ($stat['status']) {
-                                case 'confirmed': $bg_class = 'bg-success'; break;
-                                case 'pending': $bg_class = 'bg-warning'; break;
-                                case 'cancelled': $bg_class = 'bg-danger'; break;
-                                case 'completed': $bg_class = 'bg-info'; break;
-                                default: $bg_class = 'bg-secondary';
-                            }
-                        ?>
-                            <div class="col-md-3 mb-3">
-                                <div class="card <?php echo $bg_class; ?> text-white">
-                                    <div class="card-body text-center">
-                                        <h5><?php echo $stat['count']; ?></h5>
-                                        <p class="mb-1">
-                                            <?php 
-                                            switch ($stat['status']) {
-                                                case 'confirmed': echo 'Đã xác nhận'; break;
-                                                case 'pending': echo 'Đang chờ'; break;
-                                                case 'cancelled': echo 'Đã hủy'; break;
-                                                case 'completed': echo 'Đã hoàn thành'; break;
-                                                default: echo $stat['status'];
-                                            }
-                                            ?>
-                                        </p>
-                                        <?php if ($stat['revenue']): ?>
-                                            <small><?php echo formatPrice($stat['revenue']); ?></small>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <?php include '../includes/footer.php'; ?>
