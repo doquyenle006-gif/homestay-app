@@ -150,7 +150,7 @@ if ($action == 'add' || ($action == 'edit' && $room_id > 0)) {
 }
 
 ?>
-
+ <!-- Chức năng thêm, sửa, xóa phòng  -->
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
@@ -160,6 +160,7 @@ if ($action == 'add' || ($action == 'edit' && $room_id > 0)) {
                     <p class="text-muted">Thêm, sửa, xóa và quản lý các phòng homestay</p>
                 </div>
                 <a href="rooms.php?action=add" class="btn btn-primary">
+ <!-- Thêm phòng mới -->
                     <i class="fas fa-plus"></i> Thêm Phòng Mới
                 </a>
             </div>

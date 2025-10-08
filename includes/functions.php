@@ -135,4 +135,94 @@ if (!function_exists('showError')) {
               </div>";
     }
 }
+
+// Function to copy images to assets/images directory
+if (!function_exists('copyImageToAssets')) {
+    function copyImageToAssets($source_path, $filename = null) {
+        $assets_dir = 'assets/images/';
+        
+        // Ensure assets directory exists
+        if (!is_dir($assets_dir)) {
+            if (!mkdir($assets_dir, 0755, true)) {
+                return false;
+            }
+        }
+        
+        // Generate unique filename if not provided
+        if (!$filename) {
+            $file_extension = pathinfo($source_path, PATHINFO_EXTENSION);
+            $filename = uniqid() . '_' . time() . '.' . $file_extension;
+        }
+        
+        $destination_path = $assets_dir . $filename;
+        
+        // Copy the file
+        if (copy($source_path, $destination_path)) {
+            return $filename;
+        }
+        
+        return false;
+    }
+}
+
+// Function to handle multiple image uploads
+if (!function_exists('handleImageUploads')) {
+    function handleImageUploads($files_input_name) {
+        $uploaded_images = [];
+        
+        if (isset($_FILES[$files_input_name]) && !empty($_FILES[$files_input_name]['name'][0])) {
+            $upload_dir = 'assets/images/';
+            
+            // Ensure upload directory exists
+            if (!is_dir($upload_dir)) {
+                if (!mkdir($upload_dir, 0755, true)) {
+                    return ['error' => "Không thể tạo thư mục upload: $upload_dir"];
+                }
+            }
+            
+            if (!is_writable($upload_dir)) {
+                return ['error' => "Thư mục upload không có quyền ghi: $upload_dir"];
+            }
+            
+            // Process each uploaded file
+            foreach ($_FILES[$files_input_name]['tmp_name'] as $key => $tmp_name) {
+                if ($_FILES[$files_input_name]['error'][$key] === UPLOAD_ERR_OK) {
+                    $file_name = $_FILES[$files_input_name]['name'][$key];
+                    $file_size = $_FILES[$files_input_name]['size'][$key];
+                    $file_type = $_FILES[$files_input_name]['type'][$key];
+                    
+                    // Validate file exists in temp directory
+                    if (empty($tmp_name) || !file_exists($tmp_name)) {
+                        continue;
+                    }
+                    
+                    // Validate file type
+                    $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                    if (!in_array($file_type, $allowed_types)) {
+                        continue;
+                    }
+                    
+                    // Validate file size (2MB max)
+                    if ($file_size > 2 * 1024 * 1024) {
+                        continue;
+                    }
+                    
+                    // Generate unique filename
+                    $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+                    $new_filename = uniqid() . '_' . time() . '.' . $file_extension;
+                    $upload_path = $upload_dir . $new_filename;
+                    
+                    // Copy file to assets/images directory
+                    if (move_uploaded_file($tmp_name, $upload_path)) {
+                        if (file_exists($upload_path)) {
+                            $uploaded_images[] = $new_filename;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $uploaded_images;
+    }
+}
 ?>

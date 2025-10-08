@@ -50,18 +50,47 @@ if (!$is_included) {
             $errors[] = "Vui lòng điền đầy đủ thông tin bắt buộc!";
         }
         
+        // Handle image uploads using the new function
+        $uploaded_images = handleImageUploads('images');
+        
+        // Check if there was an error with uploads
+        if (isset($uploaded_images['error'])) {
+            $errors[] = $uploaded_images['error'];
+        }
+        
         if (empty($errors)) {
+            // Handle existing images for update
+            $current_images = [];
+            if ($room_id > 0 && $room) {
+                $current_images = !empty($room['images']) ? explode(',', $room['images']) : [];
+                
+                // Remove images marked for deletion
+                if (isset($_POST['delete_images'])) {
+                    foreach ($_POST['delete_images'] as $image_to_delete) {
+                        $image_path = $upload_dir . trim($image_to_delete);
+                        if (file_exists($image_path)) {
+                            unlink($image_path);
+                        }
+                        $current_images = array_diff($current_images, [trim($image_to_delete)]);
+                    }
+                }
+            }
+            
+            // Combine existing and new images
+            $all_images = array_merge($current_images, $uploaded_images);
+            $images_string = !empty($all_images) ? implode(',', $all_images) : '';
+            
             if ($room_id > 0) {
                 // Update existing room
-                $sql = "UPDATE rooms SET name = ?, description = ?, price_per_night = ?, capacity = ?, amenities = ?, status = ? WHERE id = ?";
+                $sql = "UPDATE rooms SET name = ?, description = ?, price_per_night = ?, capacity = ?, amenities = ?, status = ?, images = ? WHERE id = ?";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssdissi", $name, $description, $price_per_night, $capacity, $amenities, $status, $room_id);
+                $stmt->bind_param("ssdissis", $name, $description, $price_per_night, $capacity, $amenities, $status, $images_string, $room_id);
                 $success_message = "Cập nhật phòng thành công!";
             } else {
                 // Add new room
-                $sql = "INSERT INTO rooms (name, description, price_per_night, capacity, amenities, status) VALUES (?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO rooms (name, description, price_per_night, capacity, amenities, status, images) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssdiss", $name, $description, $price_per_night, $capacity, $amenities, $status);
+                $stmt->bind_param("ssdissis", $name, $description, $price_per_night, $capacity, $amenities, $status, $images_string);
                 $success_message = "Thêm phòng mới thành công!";
             }
             
@@ -116,7 +145,7 @@ if (!$is_included) {
                         </div>
                     <?php endif; ?>
 
-                    <form method="POST" action="">
+                    <form method="POST" action="" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -169,9 +198,47 @@ if (!$is_included) {
 
                         <div class="mb-3">
                             <label for="amenities" class="form-label">Tiện nghi</label>
-                            <textarea class="form-control" id="amenities" name="amenities" rows="3" 
+                            <textarea class="form-control" id="amenities" name="amenities" rows="3"
                                       placeholder="WiFi, AC, TV, Mini Bar, Sea View..."><?php echo $room ? $room['amenities'] : ''; ?></textarea>
                             <div class="form-text">Mỗi tiện nghi trên một dòng, phân cách bằng dấu phẩy.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="images" class="form-label">Hình ảnh phòng</label>
+                            <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
+                            <div class="form-text">Chọn một hoặc nhiều hình ảnh cho phòng. Định dạng: JPG, PNG, GIF. Kích thước tối đa: 2MB mỗi ảnh.</div>
+                            
+                            <?php if ($room && !empty($room['images'])): ?>
+                                <div class="mt-3">
+                                    <label class="form-label">Hình ảnh hiện tại:</label>
+                                    <div class="row">
+                                        <?php
+                                        $current_images = explode(',', $room['images']);
+                                        foreach ($current_images as $image):
+                                            if (!empty(trim($image))):
+                                        ?>
+                                            <div class="col-md-3 mb-2">
+                                                <div class="position-relative">
+                                                    <img src="../assets/images/<?php echo trim($image); ?>"
+                                                         class="img-fluid rounded border"
+                                                         style="height: 100px; object-fit: cover; width: 100%;"
+                                                         alt="Room image">
+                                                    <div class="form-check position-absolute top-0 start-0 m-1">
+                                                        <input class="form-check-input" type="checkbox"
+                                                               name="delete_images[]" value="<?php echo trim($image); ?>">
+                                                        <label class="form-check-label text-white bg-dark px-1 rounded">
+                                                            Xóa
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php
+                                            endif;
+                                        endforeach;
+                                        ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -194,6 +261,30 @@ if (!$is_included) {
                     <h5 class="mb-0"><i class="fas fa-eye"></i> Xem trước</h5>
                 </div>
                 <div class="card-body">
+                    <!-- Room Images -->
+                    <?php if (!empty($room['images'])): ?>
+                    <div class="mb-4">
+                        <h6>Hình ảnh phòng:</h6>
+                        <div class="row">
+                            <?php
+                            $preview_images = explode(',', $room['images']);
+                            foreach ($preview_images as $image):
+                                if (!empty(trim($image))):
+                            ?>
+                                <div class="col-md-3 mb-3">
+                                    <img src="../assets/images/<?php echo trim($image); ?>"
+                                         class="img-fluid rounded shadow-sm"
+                                         style="height: 150px; object-fit: cover; width: 100%;"
+                                         alt="Room image">
+                                </div>
+                            <?php
+                                endif;
+                            endforeach;
+                            ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
                     <div class="row">
                         <div class="col-md-8">
                             <h5><?php echo $room['name']; ?></h5>
@@ -201,9 +292,9 @@ if (!$is_included) {
                             <div class="mb-3">
                                 <strong>Tiện nghi:</strong>
                                 <div class="amenities-list">
-                                    <?php 
+                                    <?php
                                     $amenities_list = explode(',', $room['amenities']);
-                                    foreach ($amenities_list as $amenity): 
+                                    foreach ($amenities_list as $amenity):
                                     ?>
                                         <span class="badge bg-light text-dark me-1 mb-1"><?php echo trim($amenity); ?></span>
                                     <?php endforeach; ?>

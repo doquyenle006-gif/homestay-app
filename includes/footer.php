@@ -12,7 +12,6 @@
                     <h5>Liên kết nhanh</h5>
                     <ul class="list-unstyled">
                         <li><a href="index.php" class="text-light">Trang chủ</a></li>
-                        <li><a href="user/rooms.php" class="text-light">Danh sách phòng</a></li>
                         <li><a href="auth/login.php" class="text-light">Đăng nhập</a></li>
                         <li><a href="auth/register.php" class="text-light">Đăng ký</a></li>
                     </ul>
